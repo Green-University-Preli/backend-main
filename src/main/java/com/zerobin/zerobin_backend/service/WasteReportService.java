@@ -72,4 +72,9 @@ public class WasteReportService {
         };
     }
 
+    // delete report
+    public void deleteReport(Long id) {
+        wasteReportRepository.deleteById(id);
+    }
+
 }

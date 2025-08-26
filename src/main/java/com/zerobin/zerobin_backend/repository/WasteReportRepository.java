@@ -10,5 +10,8 @@ import com.zerobin.zerobin_backend.entity.WasteReport;
 public interface WasteReportRepository extends JpaRepository<WasteReport, Long> {
 
     List<WasteReport> findByUser_Id(Long userId);
+    
+    // delete report
+    void deleteById(Long id);
 
 }
