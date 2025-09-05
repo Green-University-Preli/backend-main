@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,8 @@ public class LeaderboardController {
 
     private final LeaderboardService leaderboardService;
     private final JwtUtil jwtUtil;
-
+    
+    
     @GetMapping("/get-leaderboard")
     public ResponseEntity<?> getLeaderboard(HttpServletRequest httpRequest) {
         String authHeader = httpRequest.getHeader("Authorization");
@@ -33,6 +35,12 @@ public class LeaderboardController {
         String token = authHeader.substring(7);
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        }
+
+        // Only allow regular users to view leaderboard
+        String role = jwtUtil.getRoleFromToken(token);
+        if (!"USER".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only users can view the leaderboard");
         }
 
         List<LeaderboardEntryDto> leaderboard = leaderboardService.getLeaderboard();

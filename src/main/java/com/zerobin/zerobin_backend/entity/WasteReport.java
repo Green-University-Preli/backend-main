@@ -19,7 +19,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.Column;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "waste_reports")
@@ -37,6 +37,7 @@ public class WasteReport {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id" , nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
 
     @Column(name = "waste_description" , nullable = false)
@@ -53,6 +54,7 @@ public class WasteReport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "waste_status" , nullable = false)
+    @Builder.Default
     private WasteStatus wasteStatus = WasteStatus.PENDING;
 
     @Column(name = "points_earned" , nullable = false)
@@ -60,5 +62,10 @@ public class WasteReport {
 
     @Column(name = "created_at" , nullable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_collector_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private User assignedCollector;
 
 }

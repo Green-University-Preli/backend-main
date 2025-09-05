@@ -45,6 +45,12 @@ public class WasteController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
         }
 
+        // Only allow regular users to create reports
+        String role = jwtUtil.getRoleFromToken(token);
+        if (!"USER".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only users can create waste reports");
+        }
+
         String email = jwtUtil.getEmailFromToken(token);
 
         WasteReport savedReport = wasteReportService.reportWaste(
@@ -71,6 +77,12 @@ public class WasteController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
         }
 
+        // Only allow regular users to access their own reports
+        String role = jwtUtil.getRoleFromToken(token);
+        if (!"USER".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only users can access their own reports");
+        }
+
         String email = jwtUtil.getEmailFromToken(token);
         List<WasteReport> reports = wasteReportService.getReportsByUser(email);
         return ResponseEntity.ok(reports);
@@ -79,9 +91,29 @@ public class WasteController {
     
     // delete report
     @DeleteMapping("/delete-report/{id}")
-    public ResponseEntity<?> deleteReport(@PathVariable Long id) {
-        wasteReportService.deleteReport(id);
-        return ResponseEntity.ok("Report deleted successfully");
+    public ResponseEntity<?> deleteReport(@PathVariable Long id, HttpServletRequest httpRequest) {
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        }
+
+        String role = jwtUtil.getRoleFromToken(token);
+        String email = jwtUtil.getEmailFromToken(token);
+
+        try {
+            boolean deleted = wasteReportService.deleteReportAs(id, email, role);
+            if (!deleted) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Report not found");
+            }
+            return ResponseEntity.ok("Report deleted successfully");
+        } catch (SecurityException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        }
     }
     
     

@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Getter
 @Setter
@@ -15,6 +17,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String email;
+    @JsonProperty(access = Access.WRITE_ONLY)
     private String password;
     private String phone;
     private String address;
