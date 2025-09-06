@@ -18,7 +18,7 @@ public class JwtUtil {
     private final String secretKey = "MySuperSecureSecretKeyThatIsAtLeast32Chars!";
 
     // Token validity: 10 hours
-    private final long jwtExpirationMs = 1000 * 60 * 60 * 10;
+    private final long jwtExpirationMs = 1000 * 60 * 60 * 24;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
