@@ -24,7 +24,7 @@ public class WasteReportService {
 
     // report waste
     public WasteReport reportWaste(String email, String wasteDescription, String wasteType,
-                                   String wasteLocation, String wasteImage) {
+                                   String wasteLocation, String wasteImage, Double weight) {
 
         // Find the user by email
         User user = userRepository.findByEmail(email)
@@ -40,6 +40,7 @@ public class WasteReportService {
                 .wasteType(wasteType)
                 .wasteLocation(wasteLocation)
                 .wasteImage(wasteImage)
+                .weight(weight)
                 .pointsEarned(points)
                 .wasteStatus(WasteStatus.PENDING) // default status
                 .createdAt(LocalDateTime.now())

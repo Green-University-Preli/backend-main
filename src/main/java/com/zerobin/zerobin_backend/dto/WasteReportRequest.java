@@ -9,4 +9,5 @@ public class WasteReportRequest {
     private String wasteType;
     private String wasteLocation;
     private String wasteImage;
+    private Double weight; // in kilograms
 }

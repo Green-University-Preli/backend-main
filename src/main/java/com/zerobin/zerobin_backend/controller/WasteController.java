@@ -58,7 +58,8 @@ public class WasteController {
                 request.getWasteDescription(),
                 request.getWasteType(),
                 request.getWasteLocation(),
-                request.getWasteImage()
+                request.getWasteImage(),
+                request.getWeight()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);

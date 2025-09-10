@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zerobin.zerobin_backend.entity.WasteReport;
 import com.zerobin.zerobin_backend.security.JwtUtil;
 import com.zerobin.zerobin_backend.service.WasteReportService;
+import com.zerobin.zerobin_backend.service.NotificationService;
+import com.zerobin.zerobin_backend.entity.notification.CollectionNotification;
+import com.zerobin.zerobin_backend.dto.collector.CollectionNotificationRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ public class CollectorWasteReportController {
 
     private final WasteReportService wasteReportService;
     private final JwtUtil jwtUtil;
+    private final NotificationService notificationService;
 
     private boolean isCollectorRole(String role) {
         return role != null && ("COLLECTOR".equalsIgnoreCase(role)
@@ -77,6 +82,39 @@ public class CollectorWasteReportController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(re.getMessage());
         } catch (Exception ex) {
             log.error("Error completing report {} by collector {}", reportId, email, ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error");
+        }
+    }
+
+    // Collector: send a collection notification to admin for verification
+    @PostMapping("/{reportId}/notify")
+    public ResponseEntity<?> notifyCollection(HttpServletRequest httpRequest,
+                                              @PathVariable Long reportId,
+                                              @RequestBody CollectionNotificationRequest body) {
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
+        }
+        String token = authHeader.substring(7);
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        }
+        String role = jwtUtil.getRoleFromToken(token);
+        if (!isCollectorRole(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden: collector role required");
+        }
+        String email = jwtUtil.getEmailFromToken(token);
+        try {
+            // Ensure the report is assigned to this collector and completed
+            WasteReport report = wasteReportService.completeReportAsCollector(reportId, email);
+            CollectionNotification notification = notificationService.createNotification(report, email, body.getMessage());
+            return ResponseEntity.status(HttpStatus.CREATED).body(notification);
+        } catch (SecurityException se) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(se.getMessage());
+        } catch (RuntimeException re) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(re.getMessage());
+        } catch (Exception ex) {
+            log.error("Error sending notification for report {} by collector {}", reportId, email, ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error");
         }
     }

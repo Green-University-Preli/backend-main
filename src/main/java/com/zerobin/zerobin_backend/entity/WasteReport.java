@@ -68,4 +68,7 @@ public class WasteReport {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User assignedCollector;
 
+    @Column(name = "weight_kg")
+    private Double weight;
+
 }
