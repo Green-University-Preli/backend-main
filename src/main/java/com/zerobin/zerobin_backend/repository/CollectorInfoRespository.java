@@ -8,6 +8,7 @@ import com.zerobin.zerobin_backend.entity.collector.CollectorInfo;
 
 public interface CollectorInfoRespository extends JpaRepository<CollectorInfo, Long> {
 
-    List<CollectorInfo> findByUserRole(String role);
+    // Query by nested property: CollectorInfo.user.role
+    List<CollectorInfo> findByUser_Role(String role);
 
 }
