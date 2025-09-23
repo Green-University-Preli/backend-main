@@ -10,4 +10,6 @@ public class WasteReportRequest {
     private String wasteLocation;
     private String wasteImage;
     private Double weight; // in kilograms
+
+    private String binId;
 }

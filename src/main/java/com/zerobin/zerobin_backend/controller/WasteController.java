@@ -1,27 +1,24 @@
 package com.zerobin.zerobin_backend.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.zerobin.zerobin_backend.security.JwtUtil;
-import com.zerobin.zerobin_backend.service.WasteReportService;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import com.zerobin.zerobin_backend.dto.WasteReportRequest;
-
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.zerobin.zerobin_backend.entity.WasteReport;
-
-import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.zerobin.zerobin_backend.dto.WasteReportRequest;
+import com.zerobin.zerobin_backend.entity.WasteReport;
+import com.zerobin.zerobin_backend.security.JwtUtil;
+import com.zerobin.zerobin_backend.service.WasteReportService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 
 
 
@@ -53,14 +50,16 @@ public class WasteController {
 
         String email = jwtUtil.getEmailFromToken(token);
 
-        WasteReport savedReport = wasteReportService.reportWaste(
-                email,
-                request.getWasteDescription(),
-                request.getWasteType(),
-                request.getWasteLocation(),
-                request.getWasteImage(),
-                request.getWeight()
-        );
+
+    WasteReport savedReport = wasteReportService.reportWaste(
+        email,
+        request.getWasteDescription(),
+        request.getWasteType(),
+        request.getWasteLocation(),
+        request.getWasteImage(),
+        request.getWeight(),
+        request.getBinId()
+    );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);
     }

@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.zerobin.zerobin_backend.repository.WasteReportRepository;
+import com.zerobin.zerobin_backend.entity.User;
 import com.zerobin.zerobin_backend.entity.WasteReport;
 import com.zerobin.zerobin_backend.enums.WasteStatus;
+import com.zerobin.zerobin_backend.repository.BinRepository;
 import com.zerobin.zerobin_backend.repository.UserRepository;
-
-import com.zerobin.zerobin_backend.entity.User;
+import com.zerobin.zerobin_backend.repository.WasteReportRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,10 +21,11 @@ public class WasteReportService {
 
     private final WasteReportRepository wasteReportRepository;
     private final UserRepository userRepository;
+    private final BinRepository binRepository;
 
     // report waste
     public WasteReport reportWaste(String email, String wasteDescription, String wasteType,
-                                   String wasteLocation, String wasteImage, Double weight) {
+                                   String wasteLocation, String wasteImage, Double weight, String binId) {
 
         // Find the user by email
         User user = userRepository.findByEmail(email)
@@ -33,18 +34,20 @@ public class WasteReportService {
         // Calculate points based on waste type
         int points = calculatePoints(wasteType);
 
-        // Create a new waste report
-        WasteReport report = WasteReport.builder()
-                .user(user)
-                .wasteDescription(wasteDescription)
-                .wasteType(wasteType)
-                .wasteLocation(wasteLocation)
-                .wasteImage(wasteImage)
-                .weight(weight)
-                .pointsEarned(points)
-                .wasteStatus(WasteStatus.PENDING) // default status
-                .createdAt(LocalDateTime.now())
-                .build();
+
+    // Create a new waste report
+    WasteReport report = WasteReport.builder()
+        .user(user)
+        .wasteDescription(wasteDescription)
+        .wasteType(wasteType)
+        .wasteLocation(wasteLocation)
+        .wasteImage(wasteImage)
+        .weight(weight)
+        .pointsEarned(points)
+        .wasteStatus(WasteStatus.PENDING) // default status
+        .createdAt(LocalDateTime.now())
+        .binId(binId)
+        .build();
 
         // Save the report
         WasteReport savedReport = wasteReportRepository.save(report);

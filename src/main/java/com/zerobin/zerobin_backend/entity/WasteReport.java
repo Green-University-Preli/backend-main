@@ -2,8 +2,10 @@ package com.zerobin.zerobin_backend.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.zerobin.zerobin_backend.enums.WasteStatus;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,8 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.Column;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "waste_reports")
@@ -70,5 +70,8 @@ public class WasteReport {
 
     @Column(name = "weight_kg")
     private Double weight;
+
+    @Column(name = "bin_id", nullable = false)
+    private String binId;
 
 }
