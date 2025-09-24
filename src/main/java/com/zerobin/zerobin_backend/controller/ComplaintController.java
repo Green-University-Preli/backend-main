@@ -62,9 +62,8 @@ public class ComplaintController {
         if (!"USER".equalsIgnoreCase(role) && !"RESIDENT".equalsIgnoreCase(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only users or residents can view their complaints");
         }
-        String email = jwtUtil.getEmailFromToken(token);
-        // You may need to fetch userId from email if needed, for now set userId as null
-        List<ComplaintDto> complaints = complaintService.getComplaintsByUser(null); // Replace null with userId if available
+    String email = jwtUtil.getEmailFromToken(token);
+    List<ComplaintDto> complaints = complaintService.getComplaintsByEmail(email);
         return ResponseEntity.ok(complaints);
     }
 

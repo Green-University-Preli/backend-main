@@ -46,6 +46,15 @@ public class ComplaintService {
                 .stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    public List<ComplaintDto> getComplaintsByEmail(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return List.of();
+        }
+        Long userId = userOpt.get().getId();
+        return getComplaintsByUser(userId);
+    }
+
     public List<ComplaintDto> getAllComplaints() {
         return complaintRepository.findAll()
                 .stream().map(this::toDto).collect(Collectors.toList());
